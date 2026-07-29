@@ -10,7 +10,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-        <!-- do not cache this page -->
+        <!-- Do not cache this page -->
         <meta http-equiv="cache-control" content="max-age=0" />
         <meta http-equiv="cache-control" content="no-cache" />
         <meta http-equiv="expires" content="0" />
@@ -29,7 +29,6 @@
                 --accent: #7a8c5e;
                 --accent-dark: #5e6e47;
                 --border: #e2d9ce;
-                --botanical: #9aaa7a;
 
                 /* Your Typography */
                 --font-script: 'Great Vibes', cursive;
@@ -237,14 +236,17 @@
                             />
 
                             <svg
+                                id="staticrypt-toggle-password"
                                 class="staticrypt-toggle-password-visibility"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
                                 title="Toggle visibility"
                             >
-                                <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"></path>
-                                <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"></path>
+                                <!-- Default icon: Eye with slash (hidden password) -->
+                                <path id="toggle-icon-slash" fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478zM12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" clip-rule="evenodd"></path>
+                                <!-- Open eye icon (visible password, hidden by default) -->
+                                <path id="toggle-icon-eye" class="hidden" d="M10 12a2 2 0 100-4 2 2 0 000 4z M10 3C4.478 3 0.627 6.903 0 10c0.627 3.097 4.478 7 10 7s9.373-3.903 10-7c-0.627-3.097-4.478-7-10-7zm0 12a5 5 0 110-10 5 5 0 010 10z"></path>
                             </svg>
                         </div>
 
@@ -658,7 +660,7 @@ exports.init = init;
   return exports;
 })());
 
-            // Statigrypt build-time placeholders
+            // StatiCrypt build-time placeholders
             const templateError = /*staticrypt_template_error*/""/*staticrypt_template_error*/,
                 templateToggleAltShow = /*staticrypt_toggle_show*/""/*staticrypt_toggle_show*/,
                 templateToggleAltHide = /*staticrypt_toggle_hide*/""/*staticrypt_toggle_hide*/,
@@ -682,9 +684,31 @@ exports.init = init;
                 }
             };
 
+            // Password Toggle Handler
+            const passwordInput = document.getElementById("staticrypt-password");
+            const toggleButton = document.getElementById("staticrypt-toggle-password");
+            const iconSlash = document.getElementById("toggle-icon-slash");
+            const iconEye = document.getElementById("toggle-icon-eye");
+
+            if (toggleButton && passwordInput) {
+                toggleButton.addEventListener("click", function () {
+                    const isPassword = passwordInput.getAttribute("type") === "password";
+                    
+                    if (isPassword) {
+                        passwordInput.setAttribute("type", "text");
+                        iconSlash.classList.add("hidden");
+                        iconEye.classList.remove("hidden");
+                    } else {
+                        passwordInput.setAttribute("type", "password");
+                        iconSlash.classList.remove("hidden");
+                        iconEye.classList.add("hidden");
+                    }
+                });
+            }
+
             document.getElementById("staticrypt-form").addEventListener("submit", async function (e) {
                 e.preventDefault();
-                const password = document.getElementById("staticrypt-password").value;
+                const password = passwordInput.value;
                 const remember = document.getElementById("staticrypt-remember").checked;
 
                 const { isSuccessful } = await staticrypt.handleDecryptionOfPage(password, remember);
